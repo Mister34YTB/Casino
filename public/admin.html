@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Casino - Admin</title>
+  <style>
+    body { font-family: Arial; background: #202020; color: white; text-align: center; margin-top: 60px; }
+    button { margin: 5px; padding: 10px 15px; font-size: 16px; cursor: pointer; }
+    input { padding: 6px; margin: 5px; }
+  </style>
+</head>
+<body>
+  <h1>💼 Panneau Admin</h1>
+
+  <p>ID du joueur :</p>
+  <input type="text" id="discordId" placeholder="1234567890">
+  <p>Montant :</p>
+  <input type="number" id="amount" placeholder="Montant €">
+  <button onclick="updateBalance(true)">Ajouter</button>
+  <button onclick="updateBalance(false)">Retirer</button>
+
+  <div id="msg" style="margin-top:20px;"></div>
+
+  <script>
+    async function updateBalance(add) {
+      const id = document.getElementById('discordId').value.trim();
+      const amount = Number(document.getElementById('amount').value);
+      if (!id || !amount) return alert("Remplis tous les champs !");
+      const res = await fetch(`/api/update_balance/${id}`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ amount: add ? amount : -amount })
+      });
+      const data = await res.json();
+      document.getElementById('msg').innerHTML = `<p>✅ Nouveau solde : ${data.new_balance} €</p>`;
+    }
+  </script>
+</body>
+</html>
