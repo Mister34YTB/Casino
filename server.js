@@ -5,6 +5,8 @@ import cors from "cors";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const API_KEY = process.env.API_KEY || "dev-secret";
+
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -33,6 +35,11 @@ app.get("/api/solde/:discordId", (req, res) => {
 });
 
 app.post("/api/update_balance/:discordId", (req, res) => {
+  const auth = req.headers["authorization"];
+  if (auth !== `Bearer ${API_KEY}`) {
+    return res.status(403).json({ error: "Accès refusé." });
+  }
+
   const id = req.params.discordId;
   const { amount } = req.body;
   if (typeof amount !== "number") return res.status(400).json({ error: "Montant invalide" });
@@ -44,6 +51,7 @@ app.post("/api/update_balance/:discordId", (req, res) => {
 
   res.json({ success: true, new_balance: data[id].balance });
 });
+
 
 // --- Serve les pages HTML ---
 app.get("/", (req, res) => res.sendFile("public/joueur.html", { root: "." }));
